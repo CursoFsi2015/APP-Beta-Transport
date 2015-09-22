@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/APP-FINAL/Proyecto Fin de Curso/Proyecto Fin de Curso/BaseDatosMarco/AccesosBBDD.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/ProyectoAlmacen/jgoodies-common-1.8.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/ProyectoAlmacen/jgoodies-common-1.8.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/ProyectoAlmacen/jgoodies-forms-1.8.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/ProyectoAlmacen/jgoodies-forms-1.8.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/UCanAccess-3.0.0-bin/ucanaccess-3.0.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/UCanAccess-3.0.0-bin/lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/UCanAccess-3.0.0-bin/lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/UCanAccess-3.0.0-bin/lib/hsqldb.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/JAVA y UML/ProyectoFinDeClase/UCanAccess-3.0.0-bin/lib/jackcess-2.1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/eclipse-java-luna-SR2-win32-x86_64/jcalendar-1.4/lib/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/eclipse-java-luna-SR2-win32-x86_64/jcalendar-1.4/lib/jgoodies-common-1.2.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/eclipse-java-luna-SR2-win32-x86_64/jcalendar-1.4/lib/jgoodies-looks-2.4.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Profesor/Desktop/ELOY FIS/eclipse-java-luna-SR2-win32-x86_64/jcalendar-1.4/lib/junit-4.6.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

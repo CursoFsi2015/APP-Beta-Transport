@@ -18,8 +18,8 @@ public class LauncherTrans {
 	            }catch(Exception e){
 	              e.printStackTrace();
 	            } 
-	     	Disparador id = new Disparador("idTransporte");
-		 	Tablas bbdd = new Tablas(); //instancia una clase con los registros de todas las tablas
+	     	//Disparador id = new Disparador("idTransporte");
+		 	//Tablas bbdd = new Tablas(); //instancia una clase con los registros de todas las tablas
 	        InterfaceTrans appTrans =new InterfaceTrans();
 
 	}

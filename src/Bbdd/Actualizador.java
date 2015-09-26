@@ -1,6 +1,6 @@
 package Bbdd;
 
-import prueba.ConexionAccess;
+
 
 /**
  * Clase principal que realiza querys INSERT, UPDATE y DELETE

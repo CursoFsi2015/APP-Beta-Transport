@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -67,10 +68,11 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 	// Reloj
 	private JLabel lblReloj;
-	private String dia, mes, año, hora, minutos, segundos;
+	private String dia, mes, aÃ±o, hora, minutos, segundos;
 	private Calendar calendario = new GregorianCalendar();
 	Thread hilo;
 	private JSeparator separatorTitulo;
+	private JLabel lblVerturno;
 	private JLabel lblTurno;
 	// Fin Reloj
 
@@ -102,9 +104,9 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 			String path = archivo.getSelectedFile().getPath();
 			Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + path);
 		} else if (r == JFileChooser.CANCEL_OPTION) {
-			JOptionPane.showMessageDialog(null, "Ha cancelado su selección");
+			JOptionPane.showMessageDialog(null, "Ha cancelado su selecciÃ³n");
 		} else {
-			JOptionPane.showMessageDialog(null, "Se ha producido un error en la selección");
+			JOptionPane.showMessageDialog(null, "Se ha producido un error en la selecciÃ³n");
 		}
 
 	}
@@ -124,50 +126,79 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		Date fechaHoraActual = new Date();
 		calendario.setTime(fechaHoraActual);
 
+		//Hora 
 		hora = String.valueOf(calendario.get(Calendar.HOUR_OF_DAY));
 		minutos = calendario.get(Calendar.MINUTE) > 9 ? "" + calendario.get(Calendar.MINUTE): "0" + calendario.get(Calendar.MINUTE);
 		segundos = calendario.get(Calendar.SECOND) > 9 ? "" + calendario.get(Calendar.SECOND): "0\n\n" + calendario.get(Calendar.SECOND);
 		
+		//dias Meses
 		dia = calendario.get(Calendar.DATE) > 9 ? "" + calendario.get(Calendar.DATE): "0" + calendario.get(Calendar.DATE);
 		mes = calendario.get(Calendar.MONTH) > 9 ? "" + calendario.get(Calendar.MONTH): "0" + calendario.get(Calendar.MONTH);
-		año = calendario.get(Calendar.YEAR) > 9 ? "" + calendario.get(Calendar.YEAR): "0" + calendario.get(Calendar.YEAR);
+		aÃ±o = calendario.get(Calendar.YEAR) > 9 ? "" + calendario.get(Calendar.YEAR): "0" + calendario.get(Calendar.YEAR);
 		
 	}
+	
+	
+	
 
 	@Override
-	public void run() { //
+	public void run() { // RUN DEL RELOJ
 		Thread ct = Thread.currentThread();
 		while (ct == hilo) {
 			try {
 				actualiza();
-				int mesE;
-				mesE = Integer.valueOf(mes) + 1;
 
-				lblReloj.setText("<html><center>" + dia + " / " + mesE + " / " + año + "<br><br>" + hora + ":" + minutos+ ":" + segundos); //Salida por pantalla reloj
-
+				//Convierto String a Integer
+				int mesE = Integer.valueOf(mes) + 1;
+				
+				
+				//Ver Hora
+				lblReloj.setText("<html><center>" + dia + " / " + mesE + " / " + aÃ±o + "<br><br>" + hora + ":" + minutos+ ":" + segundos); //Salida por pantalla reloj
+				//Refresco Reloj
 				Thread.sleep(1000);
+				
+				
+
 			} catch (InterruptedException ex) {
 				System.out.println(ex.getMessage());
-			}
+			}			
+			
+			//Inicio ver tunos
+			//convertimos hora a int
+			int horat = Integer.valueOf(hora);
 
+			// Ver turnos con IF
+			if (horat >= 6 && horat <= 13) 
+			{
+				lblVerturno.setText("MAÃ‘ANA");
+			} 
+			
+			else if (horat >= 14 && horat <= 21) 
+			{
+				lblVerturno.setText("TARDE");
+			}
+			
+			else 
+			{
+				lblVerturno.setText("NOCHE");
+			}
+			// Fin Ver turno
 		}
 		
-		
-
 	}
 
-	static void creaFrame() {// Metodo que agrega un muestra un Frame con reloj incluido
+	static void creaFrame() {// Metodo que agrega un Frame con reloj incluido
 		
 	InterfaceTrans reloj = new InterfaceTrans(0, 0, 0, 0);// Instancia de nuestra clase Reloj
 												// (0,0,0,0 ya que el layout es x defecto)
 	
-	// Sino aquí es donde dan locación y tamaño
+	// Sino aquÃ­ es donde dan locaciÃ³n y tamaÃ±o
 	reloj.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);// Centrado// del texto
-	reloj.setFont(new java.awt.Font("Arial", 1, 18));// tipo de letra y tamaño
+	reloj.setFont(new java.awt.Font("Arial", 1, 18));// tipo de letra y tamaÃ±o
 	
 	JFrame ventana = new JFrame();// Instancia de la clase JFrame
-	ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// Botón de cerrar
-	ventana.setBounds(0, 0, 200, 100);// Tamaño
+	ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// BotÃ³n de cerrar
+	ventana.setBounds(0, 0, 200, 100);// TamaÃ±o
 	ventana.getContentPane().add(reloj);// Agregado del reloj
 	ventana.setLocationRelativeTo(null);// Lo centramos en la pantalla
 	ventana.setVisible(true);// Lo hacemos visible
@@ -177,13 +208,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 	private void setHorizontalAlignment(int center) {} // Sin este metodo no funciona el Reloj
 	//----------------------
 	// FIN METODOS RELOJ
-	//----------------------
-	
-	///----------
-	/// Horarios
-	///----------
-	
-	
+	//---------------------
 	
 	///***************************
 
@@ -193,7 +218,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		setTitle("Pantalla Principal");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-		setSize(1280, 720); //Tamaño
+		setSize(1280, 720); //TamaÃ±o
 		setLocationRelativeTo(null);// Centrar ventana
 		
 		// donde se ejecute el programa
@@ -205,7 +230,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		super.menu2.setVisible(false);
 		super.tb1.setVisible(false);
 
-		// Añado a la barra los elementos que si necesito
+		// AÃ±ado a la barra los elementos que si necesito
 
 		abrir = new JMenuItem("Abrir...   Alt+B");
 		abrir.setMnemonic('B');
@@ -293,7 +318,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		borrar = new JButton("Borrar");
 		borrar.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e) { // usado para dejar las cajas de texto vacías
+			public void actionPerformed(ActionEvent e) { // usado para dejar las cajas de texto vacÃ­as
 
 				cajaId_Transporte.setText(null);
 				cajaId_Cliente.setText(null);
@@ -341,7 +366,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		panel1.add(cajaId_Producto);
 		panel1.add(cajaTipo_Viaje);
 
-		separador.addTab("Gestion  de Transporte", null, panel1, "Separador1"); // Añadimos el Panel1 al separador
+		separador.addTab("Gestion  de Transporte", null, panel1, "Separador1"); // AÃ±adimos el Panel1 al separador
 
 		panel1.add(dateRecep);
 
@@ -391,10 +416,10 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		label_logo.setIcon(new ImageIcon(InterfaceTrans.class.getResource("/FinalLaGestionTransport/mini-logo.png")));
 		label_logo.setBounds(1058, 11, 207, 114);
 		panel1.add(label_logo);
-		getContentPane().add(separador); // sin esto no se veria nada, añadimos al JFrame el JTabbedPane
+		getContentPane().add(separador); // sin esto no se veria nada, aÃ±adimos al JFrame el JTabbedPane
 
 		// ------------------------------------------------------------------------------------------------
-		// --------------------------A partir de aquí el panel 2
+		// --------------------------A partir de aquÃ­ el panel 2
 		// ------------------------------------------
 		// ------------------------------------------------------------------------------------------------
 		panel2 = new JPanel();
@@ -469,15 +494,20 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		lblReloj.setBounds(61, 189, 312, 201);
 		panel2.add(lblReloj);
 		
-		lblTurno = new JLabel("");
-		lblTurno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
-		lblTurno.setBounds(118, 401, 146, 27);
+		//Label Turno
+		lblTurno = new JLabel("HORARIO/TURNO");
+		lblTurno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
+		lblTurno.setBounds(61, 401, 186, 27);
 		panel2.add(lblTurno);
+		
+		lblVerturno = new JLabel("");
+		lblVerturno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 24));
+		lblVerturno.setForeground(Color.BLUE);
+		lblVerturno.setBounds(61, 446, 233, 66);
+		panel2.add(lblVerturno);
 
 		//Separador
-		getContentPane().add(separador); // sin esto no se veria nada, añadimos al JFrame el JTabbedPane
+		getContentPane().add(separador); // sin esto no se veria nada, aÃ±adimos al JFrame el JTabbedPane
 
 	}
-	
-
 }

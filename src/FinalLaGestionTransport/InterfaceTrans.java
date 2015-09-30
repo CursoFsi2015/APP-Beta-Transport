@@ -1,19 +1,20 @@
 package FinalLaGestionTransport;
 
 import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.text.ParseException;
+import java.io.File;
+
+import java.io.IOException;
+
 import java.text.SimpleDateFormat;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import java.util.Map.Entry;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,12 +30,18 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 import com.toedter.calendar.JDateChooser;
 import Bbdd.Disparador;
+import Bbdd.Tablas;
+import Bbdd.Transporte;
+import jxl.Sheet;
+import jxl.Workbook;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JSeparator;
-import java.awt.Component;
+import javax.swing.border.BevelBorder;
 
 @SuppressWarnings("serial")
 public class InterfaceTrans extends InterfazComun implements Runnable {
@@ -43,12 +50,26 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 	private JPanel panel1, panel2;
 	private JTextField cajaId_Transporte, cajaId_Cliente, cajaId_Producto, cajaTipo_Viaje;
 	private JLabel lblId_Transporte, lblId_Cliente, lblId_Producto, lblTipo_Viaje, lblFechaEnvio, lblFechaRecepcion;
+	
 	private JButton guardar, borrar;
-	private JScrollPane sp, scrollPane;
+	private JScrollPane sp;
+	
+	
 	private JTable tabla;
-	private JTable tabla2;
+	String columnas[] = { 
+			" N\u00BA Transporte ", 
+			" ID Cliente ", 
+			" ID Producto ", 
+			" Tipo Viaje ", 
+			" Fecha Envio ",
+			" Fecha Recogida " };
+	private Object[][] contenido;
+    private DefaultTableModel ModeloTablaTrans;
+
+    
 	private JMenuItem abrir;
 	private static JFileChooser archivo;
+
 	@SuppressWarnings("rawtypes")
 	private JComboBox comboBox;
 	private JButton btnOk;
@@ -63,7 +84,6 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 	private JDateChooser dateEnvio;
 	private JLabel labelConductor;
 	private JLabel label_2;
-	private JButton btnQuitar;
 	private JLabel labelLogo;
 
 	// Reloj
@@ -76,6 +96,13 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 	private JLabel lblTurno;
 	// Fin Reloj
 
+	// Table 2
+	private static JTable tabla2;
+	private static DefaultTableModel tabla21;
+	private JButton btnVerConductores;
+	
+
+	
 	// ---------------------------------------------------------
 	// --------------- A partir de aqui metodo del JFileChooser
 	// -----------------
@@ -83,17 +110,17 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 	private static void archivotrans() throws Throwable {
 
+		// Evento de selecionar fichero
 		archivo = new JFileChooser();
 		archivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
 		// Creamos el filtro
-		
+
 		// 1 titulo - 2 extension
 		FileNameExtensionFilter filtro = new FileNameExtensionFilter("*.PDF", "pdf");
 		FileNameExtensionFilter filtro2 = new FileNameExtensionFilter("*.DOC", "doc");
 		FileNameExtensionFilter filtro3 = new FileNameExtensionFilter("*.TXT", "txt");
-		
-		
+
 		// Le indicamos el filtro
 		archivo.setFileFilter(filtro);
 		archivo.setFileFilter(filtro2);
@@ -113,33 +140,35 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 	// ---------------------------------------
 	// FIN DEL METODO DE SELECCION DE ARCHIVO
-	
-	//---------------------------
+
+	// ---------------------------
 	// METODOS -- CONSTRUCTORES -- RELOJ
-	//--------------------------
+	// --------------------------
 	public InterfaceTrans(int x, int y, int p, int p1) { // Constructor
 		setBounds(x, y, p, p1);
 	} // fin constructor
 
-	public void actualiza() { //MEtodo para actualizar la hora
+	public void actualiza() { // MEtodo para actualizar la hora
 
 		Date fechaHoraActual = new Date();
 		calendario.setTime(fechaHoraActual);
 
-		//Hora 
+		// Hora
 		hora = String.valueOf(calendario.get(Calendar.HOUR_OF_DAY));
-		minutos = calendario.get(Calendar.MINUTE) > 9 ? "" + calendario.get(Calendar.MINUTE): "0" + calendario.get(Calendar.MINUTE);
-		segundos = calendario.get(Calendar.SECOND) > 9 ? "" + calendario.get(Calendar.SECOND): "0\n\n" + calendario.get(Calendar.SECOND);
-		
-		//dias Meses
-		dia = calendario.get(Calendar.DATE) > 9 ? "" + calendario.get(Calendar.DATE): "0" + calendario.get(Calendar.DATE);
-		mes = calendario.get(Calendar.MONTH) > 9 ? "" + calendario.get(Calendar.MONTH): "0" + calendario.get(Calendar.MONTH);
-		año = calendario.get(Calendar.YEAR) > 9 ? "" + calendario.get(Calendar.YEAR): "0" + calendario.get(Calendar.YEAR);
-		
+		minutos = calendario.get(Calendar.MINUTE) > 9 ? "" + calendario.get(Calendar.MINUTE)
+				: "0" + calendario.get(Calendar.MINUTE);
+		segundos = calendario.get(Calendar.SECOND) > 9 ? "" + calendario.get(Calendar.SECOND)
+				: "0\n\n" + calendario.get(Calendar.SECOND);
+
+		// dias Meses
+		dia = calendario.get(Calendar.DATE) > 9 ? "" + calendario.get(Calendar.DATE)
+				: "0" + calendario.get(Calendar.DATE);
+		mes = calendario.get(Calendar.MONTH) > 9 ? "" + calendario.get(Calendar.MONTH)
+				: "0" + calendario.get(Calendar.MONTH);
+		año = calendario.get(Calendar.YEAR) > 9 ? "" + calendario.get(Calendar.YEAR)
+				: "0" + calendario.get(Calendar.YEAR);
+
 	}
-	
-	
-	
 
 	@Override
 	public void run() { // RUN DEL RELOJ
@@ -148,85 +177,75 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 			try {
 				actualiza();
 
-				//Convierto String a Integer
+				// Convierto String a Integer
 				int mesE = Integer.valueOf(mes) + 1;
-				
-				
-				//Ver Hora
-				lblReloj.setText("<html><center>" + dia + " / " + mesE + " / " + año + "<br><br>" + hora + ":" + minutos+ ":" + segundos); //Salida por pantalla reloj
-				//Refresco Reloj
+
+				// Ver Hora
+				lblReloj.setText("<html><center>" + dia + " / " + mesE + " / " + año + "<br><br>" + hora + ":" + minutos
+						+ ":" + segundos); // Salida por pantalla reloj
+				// Refresco Reloj
 				Thread.sleep(1000);
-				
-				
 
 			} catch (InterruptedException ex) {
 				System.out.println(ex.getMessage());
-			}			
-			
-			//Inicio ver tunos
-			//convertimos hora a int
+			}
+
+			// Inicio ver tunos
+			// convertimos hora a int
 			int horat = Integer.valueOf(hora);
 
 			// Ver turnos con IF
-			if (horat >= 6 && horat <= 13) 
-			{
+			if (horat >= 6 && horat <= 13) {
 				lblVerturno.setText("MAÑANA");
-			} 
-			
-			else if (horat >= 14 && horat <= 21) 
-			{
+			}
+
+			else if (horat >= 14 && horat <= 21) {
 				lblVerturno.setText("TARDE");
 			}
-			
-			else 
-			{
+
+			else {
 				lblVerturno.setText("NOCHE");
 			}
 			// Fin Ver turno
 		}
-		
+
 	}
 
 	static void creaFrame() {// Metodo que agrega un Frame con reloj incluido
-		
-	InterfaceTrans reloj = new InterfaceTrans(0, 0, 0, 0);// Instancia de nuestra clase Reloj
-												// (0,0,0,0 ya que el layout es x defecto)
-	
-	// Sino aquí es donde dan locación y tamaño
-	reloj.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);// Centrado// del texto
-	reloj.setFont(new java.awt.Font("Arial", 1, 18));// tipo de letra y tamaño
-	
-	JFrame ventana = new JFrame();// Instancia de la clase JFrame
-	ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// Botón de cerrar
-	ventana.setBounds(0, 0, 200, 100);// Tamaño
-	ventana.getContentPane().add(reloj);// Agregado del reloj
-	ventana.setLocationRelativeTo(null);// Lo centramos en la pantalla
-	ventana.setVisible(true);// Lo hacemos visible
 
-}
+		@SuppressWarnings("unused")
+		InterfaceTrans reloj = new InterfaceTrans(0, 0, 0, 0);// Instancia de
+																// nuestra clase
+																// Reloj
+		// (0,0,0,0 ya que el layout es x defecto)
 
-	private void setHorizontalAlignment(int center) {} // Sin este metodo no funciona el Reloj
-	//----------------------
+	}
+
+	@SuppressWarnings("unused")
+	private void setHorizontalAlignment(int center) {
+	} // Sin este metodo no funciona el Reloj
+	// ----------------------
 	// FIN METODOS RELOJ
-	//---------------------
-	
-	///***************************
+	// ---------------------
+
+	/// ***************************
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public InterfaceTrans() {
 
 		setTitle("Pantalla Principal");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		setSize(1280, 720); //Tamaño
+		setSize(1280, 720); // Tamaño
 		setLocationRelativeTo(null);// Centrar ventana
-		
+
 		// donde se ejecute el programa
 		setResizable(true);
 		setVisible(true);
 
 		// Quito la visibilidad de los elementos del padre que no necesito
-		super.contentPane.setVisible(false); // para que se vea mi Panel en vez del gris heredado
+		super.contentPane.setVisible(false); // para que se vea mi Panel en vez
+												// del gris heredado
 		super.menu2.setVisible(false);
 		super.tb1.setVisible(false);
 
@@ -234,7 +253,11 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 		abrir = new JMenuItem("Abrir...   Alt+B");
 		abrir.setMnemonic('B');
-		abrir.setIcon(new ImageIcon(InterfaceTrans.class.getResource(""))); // "" para colocar un icono
+		abrir.setIcon(new ImageIcon(InterfaceTrans.class.getResource(""))); // ""
+																			// para
+																			// colocar
+																			// un
+																			// icono
 		abrir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				try {
@@ -248,33 +271,46 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 		// -------------- Tabla ----------------------------------------------
 		// -------------------------------------------------------------------
-		String filas[][] = { { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" } };
+       
+		tabla = new JTable();
+		
+		//ARRAY QUE CAPTURA EL CONTENIDO
+		contenido = new Object[Tablas.transporte.size()][6];
+        int contador = 0;
+        for(Entry<Integer, Transporte> entrada : Tablas.transporte.entrySet()){
+                contenido[contador][0] = entrada.getValue().getId();
+                contenido[contador][1] = entrada.getValue().getIdCliente();
+                contenido[contador][2] = entrada.getValue().getIdProducto();
+                contenido[contador][3] = entrada.getValue().isTipoViaje();
+                contenido[contador][4] = entrada.getValue().getFechaEntrega();
+                contenido[contador][5] = entrada.getValue().getFechaRecogida();
+                contador++;
+        }
+         
+        ModeloTablaTrans = new DefaultTableModel(contenido, columnas){
+            private static final long serialVersionUID = 1L;
+            public boolean isCellEditable(int rowIndex,int columnIndex){
+                return false;
+            }
+             
+        };
+        //-----
 
-		String columnas[] = { " N\u00BA Transporte ", " ID Cliente ", " ID Producto ", " Tipo Viaje ", " Fecha Envio ",
-				" Fecha Recogida " };
-
-		tabla = new JTable(filas, columnas);
-		// No queremos ver las lineas verticales
+        //COJEMO EL MODELO DE LA TABLA
+        tabla = new JTable(ModeloTablaTrans);
 		tabla.setShowVerticalLines(true);
-		// No queremos ver las lineas verticales
 		tabla.setShowHorizontalLines(true);
-		// se puede seleccionar mas de una fila
-		tabla.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); //SELECCION SENCILLA
 		tabla.setVisible(true);
 
-		sp = new JScrollPane(tabla); // Necesita un Scrol para que se vean las
-										// columnas
+		sp = new JScrollPane(tabla); // Necesita un Scroll para que se vean las  columnas
 		sp.setBounds(608, 182, 616, 337);
 
-		// ---------------------------------------------------------
+		
+		
+		
+
 		// -------A partir de aqui el tabbedPaned-------------------
-		// ---------------------------------------------------------
 
 		separador = new JTabbedPane();
 		panel1 = new JPanel();
@@ -308,23 +344,31 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 			public void actionPerformed(ActionEvent e) {
 
-				// Aqui es donde pondre el codigo que almacene en la base de
-				// datos
-				// lo que se introduzca en los campos
+				Transporte t = new Transporte();
+				Disparador d = new Disparador("idTransporte");
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+				if(t.insertar(d.nextValue(), Integer.parseInt(cajaId_Cliente.getText()),
+						Integer.parseInt(cajaId_Producto.getText()), cajaTipo_Viaje.getText(), 
+						sdf.format(dateEnvio.getCalendar().getTime()), 
+						sdf.format(dateRecep.getCalendar().getTime())) == true
+				){
+					JOptionPane.showMessageDialog(null, "El registro " + 
+				d.insert() + " se ha insertado correctamente");
+				}
 			}
 
 		});
 
-		borrar = new JButton("Borrar");
+		borrar = new JButton("LIMPIAR REGISTRO");
 		borrar.addActionListener(new ActionListener() {
 
-			public void actionPerformed(ActionEvent e) { // usado para dejar las cajas de texto vacías
+			public void actionPerformed(ActionEvent e) { // usado para dejar las vacías
 
 				cajaId_Transporte.setText(null);
 				cajaId_Cliente.setText(null);
 				cajaId_Producto.setText(null);
 				cajaTipo_Viaje.setText(null);
-				dateRecep.setCalendar(null);
+				dateRecep.setCalendar(null); // vaciamos la caja del calendario
 				dateEnvio.setCalendar(null); // vaciamos la caja del calendario
 
 			}
@@ -347,7 +391,7 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		// ----------Botones-------------
 
 		guardar.setBounds(270, 423, 85, 30);
-		borrar.setBounds(435, 423, 85, 30);
+		borrar.setBounds(384, 423, 136, 30);
 
 		dateRecep.setBounds(270, 382, 250, 30);
 		panel1.add(sp);
@@ -366,7 +410,11 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		panel1.add(cajaId_Producto);
 		panel1.add(cajaTipo_Viaje);
 
-		separador.addTab("Gestion  de Transporte", null, panel1, "Separador1"); // Añadimos el Panel1 al separador
+		separador.addTab("Gestion  de Transporte", null, panel1, "Separador1"); // Añadimos
+																				// el
+																				// Panel1
+																				// al
+																				// separador
 
 		panel1.add(dateRecep);
 
@@ -416,7 +464,8 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		label_logo.setIcon(new ImageIcon(InterfaceTrans.class.getResource("/FinalLaGestionTransport/mini-logo.png")));
 		label_logo.setBounds(1058, 11, 207, 114);
 		panel1.add(label_logo);
-		getContentPane().add(separador); // sin esto no se veria nada, añadimos al JFrame el JTabbedPane
+		getContentPane().add(separador); // sin esto no se veria nada, añadimos
+											// al JFrame el JTabbedPane
 
 		// ------------------------------------------------------------------------------------------------
 		// --------------------------A partir de aquí el panel 2
@@ -428,39 +477,38 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 
 		separador.addTab("Conductores", null, panel2, "Separador1");
 
-		btnAgregarCondutores = new JButton("ALTA CONDUTORES");
+		btnAgregarCondutores = new JButton("MODIFICAR CONDUCTORES");
 		btnAgregarCondutores.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent arg0) {
+//				AddConductores verformulario2 = new AddConductores();
+//				verformulario2.setVisible(true);
+				
+				try {
+					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler C:\\LaGestion\\Conductores.xls");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 			}
 		});
-		btnAgregarCondutores.setBounds(420, 216, 171, 52);
-		panel2.add(btnAgregarCondutores);
 
-		String filas2[][] = { { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" },
-				{ " ", " ", " ", "", "", "" }, { " ", " ", " ", "", "", "" } };
-
-		String columnas2[] = { " N\u00BA Conductor ", " Empresa ", " Telefono ", " Horario ", " Nombre ",
-				" Matricula" };
-
-		tabla2 = new JTable(filas2, columnas2);
+		tabla2 = new JTable();
+		tabla21 = new DefaultTableModel();
+		tabla2.setModel(tabla21);
+		tabla2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		tabla2.setBackground(Color.LIGHT_GRAY);
+		tabla2.setBounds(601, 189, 648, 400);
 		// No queremos ver las lineas verticales
-		
 		tabla2.setShowVerticalLines(true);
 		// No queremos ver las lineas verticales
-		
 		tabla2.setShowHorizontalLines(true);
-		// se puede seleccionar mas de una fila
-		tabla2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		tabla2.setVisible(true);
+		panel2.add(tabla2);
 
-		scrollPane = new JScrollPane(tabla2);
-		scrollPane.setBounds(601, 146, 616, 337);
-		panel2.add(scrollPane);
+		btnAgregarCondutores.setBounds(384, 216, 207, 103);
+		panel2.add(btnAgregarCondutores);
 
 		labelLogo = new JLabel("");
 		labelLogo.setIcon(new ImageIcon(InterfaceTrans.class.getResource("/FinalLaGestionTransport/mini-logo.png")));
@@ -482,32 +530,78 @@ public class InterfaceTrans extends InterfazComun implements Runnable {
 		separatorTitulo.setBounds(61, 72, 441, 10);
 		panel2.add(separatorTitulo);
 
-		btnQuitar = new JButton("BAJA CONDUCTORES");
-		btnQuitar.setBounds(420, 284, 171, 52);
-		panel2.add(btnQuitar);
-
-		//RELOJ
+		// RELOJ
 		hilo = new Thread(this);
 		hilo.start();
 		lblReloj = new JLabel("");
 		lblReloj.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 22));
 		lblReloj.setBounds(61, 189, 312, 201);
 		panel2.add(lblReloj);
-		
-		//Label Turno
+
+		// Label Turno
 		lblTurno = new JLabel("HORARIO/TURNO");
 		lblTurno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 18));
 		lblTurno.setBounds(61, 401, 186, 27);
 		panel2.add(lblTurno);
-		
+
 		lblVerturno = new JLabel("");
 		lblVerturno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 24));
 		lblVerturno.setForeground(Color.BLUE);
 		lblVerturno.setBounds(61, 446, 233, 66);
 		panel2.add(lblVerturno);
+		
+		btnVerConductores = new JButton("VER CONDUCTORES");
+		btnVerConductores.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+						String ruta = "C:\\LaGestion\\Conductores.xls";
+				    	JFileChooser excel = new JFileChooser();
+						excel.setSelectedFile(new File(ruta));
+						File archivoexcel = null;
+						archivoexcel = excel.getSelectedFile().getAbsoluteFile();
 
-		//Separador
-		getContentPane().add(separador); // sin esto no se veria nada, añadimos al JFrame el JTabbedPane
+						try {
+							
+							Workbook leerEx = Workbook.getWorkbook(archivoexcel);
+							
+							for (int hoja = 0; hoja < leerEx.getNumberOfSheets(); hoja++) {
+
+								Sheet hojap = leerEx.getSheet(hoja);
+								int colum2 = hojap.getColumns();
+								int filas1 = hojap.getRows();
+								Object data[] = new Object[colum2];
+								
+								for (int fila = 0; fila < filas1; fila++) {
+									for (int colum1 = 0; colum1 < colum2; colum1++) {
+										if (fila == 0) {
+											tabla21.addColumn(hojap.getCell(colum1, fila).getContents());
+										}
+//										System.out.println(hojap.getCell(colum1, fila).getContents());
+										if (fila >= 1)
+											data[colum1] = hojap.getCell(colum1, fila).getContents();
+									}
+									tabla21.addRow(data);
+								}
+
+							}
+
+							// opcional
+							tabla21.removeRow(0);
+						} catch (Exception e) {
+						   
+						}
+						// FIN DE LEER EXCEL
+				
+						
+						btnVerConductores.setEnabled(false);
+			}
+		});
+		btnVerConductores.setBounds(601, 141, 153, 37);
+		panel2.add(btnVerConductores);
+
+		// Separador
+		getContentPane().add(separador); // sin esto no se veria nada, añadimos
+											// al JFrame el JTabbedPane
 
 	}
 }
